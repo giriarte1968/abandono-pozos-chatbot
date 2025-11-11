@@ -5,6 +5,8 @@ import os
 from sentence_transformers import SentenceTransformer
 import ollama
 
+# Inicializa el cliente Oracle con la carpeta Wallet
+oracledb.init_oracle_client(config_dir="Wallet_RAGTEST")
 # ========================================
 # CONFIGURACIÓN
 # ========================================
@@ -16,6 +18,7 @@ DB_USER = st.secrets.get("DB_USER", "vector")
 DB_PASSWORD = st.secrets.get("DB_PASSWORD", "AXPHAXPHAXPH777a.")
 CONNECT_ALIAS = st.secrets.get("CONNECT_ALIAS", "ragtest_high")
 WALLET_PATH = st.secrets.get("WALLET_PATH", r"C:\Users\Gustavo\pruebaonedrive\Wallet_RAGTEST")
+oracledb.init_oracle_client(config_dir="Wallet_RAGTEST")
 MODEL_NAME = "gpt-oss:20b"
 TABLE_NAME = "faqs"
 os.environ['TNS_ADMIN'] = WALLET_PATH
