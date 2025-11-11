@@ -1,0 +1,13 @@
+¿De dónde viene el cemento y cómo funciona la logística de tolvas y cisternas?
+=====
+Las tolvas de cemento, propiedad del holding y abastecidas en la planta de PCR en Pico Truncado (Santa Cruz), se emplean para el traslado a granel del cemento Portland aditivado. La gestión directa de estos activos logísticos permite asegurar control de calidad del material, disponibilidad y cumplimiento de plazos de entrega.
+
+El trayecto desde Pico Truncado a los yacimientos del norte santacruceño suele ser de varios cientos de kilómetros; por ello se planifican rutas prioritarias y condiciones de seguridad en ruta. Los camiones cisterna de agua (cap. 25 m³) abastecen las piletas de control para mezclar cementos, limpiar y purgar el pozo.
+
+En los proyectos donde la logística de camiones cisterna forma parte del contrato integral, la coordinación con SAP puede estructurarse de dos formas, según la modalidad comercial acordada:
+
+Opción 1: Cada equipo (cementadora, cisterna, pulling, etc.) registra su parte diario o comprobante de trabajo individual en SAP, y luego estos reportes se consolidan en una única línea de cotización diaria hasta el cierre del pozo, compatible con la auditoría de la Secretaría de Medio Ambiente provincial.
+
+Opción 2: Se emite un único parte diario consolidado que describe todas las tareas ejecutadas por los distintos equipos involucvolvedos durante la jornada, manteniendo la trazabilidad de recursos y actividades hasta el abandono definitivo.
+
+La modalidad elegida se define contractualmente entre la operadora y el prestador del servicio integral.

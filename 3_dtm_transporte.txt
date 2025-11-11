@@ -1,0 +1,9 @@
+¿Qué es el DTM y cómo se gestiona el transporte de personal en el abandono de pozo?
+=====
+Desmontaje, Transporte y Montaje (DTM): El DTM comprende el retiro, traslado y reinstalación de los equipos principales entre pozos (pulling, cementadoras, piletas y estructuras auxiliares). No forma parte del abandono técnico, pero sí del flujo integral de la campaña. Su objetivo es asegurar que los equipos estén disponibles y operativos en la nueva locación en los tiempos planificados.
+
+El DTM moviliza una mayor cantidad de bultos y cargas, enfocándose en la eficiencia del transporte. Gracias a la modularidad de los equipos, se redujo el volumen de carga y los tiempos de montaje, optimizando la productividad general sin afectar la dotación del abandono.
+
+Transporte de Personal: El traslado de trabajadores entre locaciones y campamentos constituye otro subproceso esencial. Se realiza mediante minibuses y vehículos ligeros bajo un esquema de coordinación central. Este transporte se gestiona dentro del mismo plan logístico del abandono, asegurando la presencia del personal técnico y operativo en el momento adecuado, en sincronía con los movimientos de equipos DTM.
+
+Ambos subprocesos (DTM y transporte de personal) se registran y controlan en SAP de manera independiente, aunque dentro del marco general de la campaña de abandono, permitiendo la trazabilidad completa de recursos humanos, materiales y tiempos.

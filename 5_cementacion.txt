@@ -1,0 +1,5 @@
+¿Cómo se realiza la cementación y colocación de tapones en el abandono de pozo?
+=====
+Cementación y colocación de tapones: Se inyectan uno o más tapones de cemento para sellar el pozo en diversos intervalos críticos.
+
+En los proyectos recientes, la operación de cementación se realiza mediante una unidad cementadora automática del holding, equipada con sensores que controlan en tiempo real la densidad, viscosidad y volumen de lechada. Esta tecnología permite trazabilidad digital completa y ajuste inmediato de los parámetros de mezcla. El bombeo se ejecuta conforme a las prácticas de seguridad y control reguladas por la Res.5/96, con registro digital de las etapas de sellado y verificación de integridad.

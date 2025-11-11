@@ -1,0 +1,13 @@
+¿Cuáles son los equipos, configuración operativa y recursos humanos para el abandono de pozo?
+=====
+El plan de abandono considera un conjunto de equipos directos e indirectos, junto con la dotación estimada de personal necesaria para cada campaña.
+
+Equipos directos: 3 unidades Pulling montadas sobre camión, 3 piletas de control, 2 cementadoras automáticas sobre semirremolque, equipadas con sensores para control en tiempo real de densidad, viscosidad y volumen de lechada, 1 unidad Wireline (uso eventual para diagnóstico o contingencia).
+
+Equipos indirectos: 2 camiones cisterna de agua (25 m³ cada uno), 2 camiones con grúa y semirremolque playo, 2 camiones logísticos (cementador), 1 set de apertura de locaciones (camión con batea y retroexcavadora), 1 minibús de transporte de personal, 2 pick-ups 4×4 de seguridad, 3 trailers (oficina, comedor, baño).
+
+Dotación estimada: 45 operarios directos (equipos de campo), 25 operarios indirectos (logística, soporte, seguridad).
+
+Distribución de roles principales: Jefe de Abandono: 1, Supervisor de Campo: 1, Operadores de Pulling: 9 (3×3), Técnicos de Pileta de Control: 6 (3×2), Operadores de Cementador: 4 (2×2), Técnicos Wireline: 3, Mecánicos/Eléctricos de Campo: 4, Personal Logístico (camiones): 5, Seguridad y Salud (HSE): 3, Apoyo (cocina, administración, limpieza): 5.
+
+Esta configuración garantiza que cada fase cuente con el personal y maquinaria especializada requerida, manteniendo eficiencia operativa y trazabilidad completa.
