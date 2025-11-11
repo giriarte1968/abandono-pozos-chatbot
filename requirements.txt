@@ -1,0 +1,6 @@
+streamlit
+oracledb
+ollama
+sentence-transformers
+torch
+numpy
