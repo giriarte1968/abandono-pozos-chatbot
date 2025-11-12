@@ -65,7 +65,7 @@ def rag_search(query: str):
             cursor.execute(f"""
                 SELECT JSON_VALUE(payload, '$.question') AS q,
                        JSON_VALUE(payload, '$.answer') AS a,
-                       JSON_VALUE(payload, '$.source') AS src,
+                       JSON_VALUE(payload, '$.source') AS src,   -- ← COMA AÑADIDA
                        VECTOR_DISTANCE(vector, TO_VECTOR(:vector), COSINE) AS dist
                 FROM {TABLE_NAME}
                 ORDER BY dist
@@ -73,4 +73,12 @@ def rag_search(query: str):
             """, {'vector': vec})
             row = cursor.fetchone()
             if row:
-                q, a
+                q, a, src, dist = row
+                return {"pregunta": q, "respuesta": a, "fuente": src, "distancia": round(dist, 4)}
+            return None
+    except Exception as e:
+        st.error(f"Error SQL: {e}")
+        return None
+    finally:
+        if 'conn' in locals():
+            conn.close()
