@@ -1,12 +1,9 @@
-# rag_chatbot.py
+# rag_llm_explica_chatbot.py
 import streamlit as st
 import oracledb
-import os
 from sentence_transformers import SentenceTransformer
 import ollama
 
-# Inicializa el cliente Oracle con la carpeta Wallet
-oracledb.init_oracle_client(config_dir="Wallet_RAGTEST")
 # ========================================
 # CONFIGURACIÓN
 # ========================================
@@ -14,36 +11,46 @@ st.set_page_config(page_title="Abandono de Pozos - RAG Chatbot", layout="centere
 st.title("Chatbot RAG + LLM: Abandono de Pozos")
 st.markdown("### Pregunta sobre el documento técnico (5 secciones)")
 
-DB_USER = st.secrets.get("DB_USER", "vector")
-DB_PASSWORD = st.secrets.get("DB_PASSWORD", "AXPHAXPHAXPH777a.")
-CONNECT_ALIAS = st.secrets.get("CONNECT_ALIAS", "ragtest_high")
-WALLET_PATH = st.secrets.get("WALLET_PATH", r"C:\Users\Gustavo\pruebaonedrive\Wallet_RAGTEST")
-oracledb.init_oracle_client(config_dir="Wallet_RAGTEST")
+# --- CREDENCIALES ORACLE (desde Secrets) ---
+DB_USER = st.secrets["DB_USER"]
+DB_PASSWORD = st.secrets["DB_PASSWORD"]
+DSN = st.secrets["DSN"]  # Ej: "dbhost.subnet.vcn.oraclecloud.com:1521/ragtest_high"
+
+# --- CONFIGURACIÓN RAG ---
 MODEL_NAME = "gpt-oss:20b"
 TABLE_NAME = "faqs"
-os.environ['TNS_ADMIN'] = WALLET_PATH
 
 @st.cache_resource
 def load_model():
     return SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
+
 encoder = load_model()
 
-try:
-    oracledb.init_oracle_client()
-except:
-    pass
+# ========================================
+# FUNCIÓN: BUSCAR EN ORACLE (DSN directo, modo Thin)
+# ========================================
+@st.cache_resource
+def get_connection():
+    try:
+        conn = oracledb.connect(
+            user=DB_USER,
+            password=DB_PASSWORD,
+            dsn=DSN
+        )
+        st.success("Conectado a Oracle")
+        return conn
+    except Exception as e:
+        st.error(f"Error de conexión: {e}")
+        return None
 
-# ========================================
-# FUNCIÓN: BUSCAR EN ORACLE
-# ========================================
 def rag_search(query: str):
+    conn = get_connection()
+    if not conn:
+        return None
+
     vec = encoder.encode([query])[0].tolist()
     try:
-        connection = oracledb.connect(
-            user=DB_USER, password=DB_PASSWORD, dsn=CONNECT_ALIAS,
-            config_dir=WALLET_PATH, wallet_location=WALLET_PATH, wallet_password=DB_PASSWORD
-        )
-        with connection.cursor() as cursor:
+        with conn.cursor() as cursor:
             cursor.setinputsizes(vector=oracledb.DB_TYPE_VECTOR)
             cursor.execute(f"""
                 SELECT
@@ -64,8 +71,8 @@ def rag_search(query: str):
         st.error(f"Error Oracle: {e}")
         return None
     finally:
-        if 'connection' in locals():
-            connection.close()
+        if 'conn' in locals():
+            conn.close()
 
 # ========================================
 # FUNCIÓN: GENERAR RESPUESTA EXPLICATIVA
@@ -112,7 +119,8 @@ for message in st.session_state.messages:
             st.caption(f"**Fuente:** {message['fuente']} | Distancia COSINE: {message['distancia']}")
 
 if prompt := st.chat_input("Ej: ¿Qué es el DTM?"):
-    st.chat_message("user").markdown(prompt)
+    with st.chat_message("user"):
+        st.markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
 
     with st.chat_message("assistant"):
