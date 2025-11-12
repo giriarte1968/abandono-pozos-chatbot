@@ -1,5 +1,5 @@
 streamlit
-oracledb==3.5.0  
+oracledb
 sentence-transformers
 torch
 ollama
