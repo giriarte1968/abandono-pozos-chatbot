@@ -14,7 +14,7 @@ st.markdown("### Pregunta sobre el documento técnico (5 secciones)")
 # --- CREDENCIALES ORACLE (desde Secrets) ---
 DB_USER = st.secrets["DB_USER"]
 DB_PASSWORD = st.secrets["DB_PASSWORD"]
-DSN = st.secrets["DSN"]  # Ej: "dbhost.subnet.vcn.oraclecloud.com:1521/ragtest_high"
+DSN = st.secrets["DSN"]  # TU DSN: adb.eu-frankfurt-1.oraclecloud.com:1522/...
 
 # --- CONFIGURACIÓN RAG ---
 MODEL_NAME = "gpt-oss:20b"
@@ -27,7 +27,7 @@ def load_model():
 encoder = load_model()
 
 # ========================================
-# FUNCIÓN: BUSCAR EN ORACLE (DSN directo, modo Thin)
+# CONEXIÓN A ORACLE (DSN directo, sin Wallet)
 # ========================================
 @st.cache_resource
 def get_connection():
@@ -37,7 +37,7 @@ def get_connection():
             password=DB_PASSWORD,
             dsn=DSN
         )
-        st.success("Conectado a Oracle")
+        st.success("Conectado a Oracle (ADB) correctamente")
         return conn
     except Exception as e:
         st.error(f"Error de conexión: {e}")
@@ -75,7 +75,7 @@ def rag_search(query: str):
             conn.close()
 
 # ========================================
-# FUNCIÓN: GENERAR RESPUESTA EXPLICATIVA
+# GENERAR RESPUESTA EXPLICATIVA
 # ========================================
 def generate_explanation(query: str, context: str, source: str, distance: float):
     prompt = f"""
