@@ -1,6 +1,5 @@
 streamlit
-oracledb
-ollama
+oracledb==2.3.0
 sentence-transformers
 torch
-numpy
+ollama
