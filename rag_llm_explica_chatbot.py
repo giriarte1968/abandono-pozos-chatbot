@@ -2,16 +2,6 @@
 import streamlit as st
 import oracledb
 from sentence_transformers import SentenceTransformer
-import ollama
-
-# ========================================
-# ACTIVAR THICK MODE (SOLUCIONA DPY-4011)
-# ========================================
-try:
-    oracledb.init_oracle_client()  # Usa Oracle Instant Client (instalado por packages.txt)
-    st.success("Oracle Thick Mode activado → Soporte para NNE en ADB")
-except Exception as e:
-    st.error(f"Error al activar Thick Mode: {e}")
 
 # ========================================
 # CONFIGURACIÓN
@@ -20,21 +10,35 @@ st.set_page_config(page_title="Abandono de Pozos - RAG Chatbot", layout="centere
 st.title("Chatbot RAG + LLM: Abandono de Pozos")
 st.markdown("### Pregunta sobre el documento técnico (5 secciones)")
 
+# --- CREDENCIALES ---
 DB_USER = st.secrets["DB_USER"]
 DB_PASSWORD = st.secrets["DB_PASSWORD"]
-DSN = st.secrets["DSN"]
+CONNECT_ALIAS = st.secrets["CONNECT_ALIAS"]
 
-MODEL_NAME = "gpt-oss:20b"
+# --- CARPETA WALLET (en GitHub) ---
+WALLET_DIR = "Wallet_RAGTEST"
+
+# --- INICIALIZAR CLIENTE ORACLE (Thin + Wallet) ---
+try:
+    oracledb.init_oracle_client(
+        config_dir=WALLET_DIR,
+        wallet_location=WALLET_DIR,
+        wallet_password=DB_PASSWORD
+    )
+    st.success("Oracle Wallet cargado (Thin mode + TCPS)")
+except Exception as e:
+    st.error(f"Error Wallet: {e}")
+
+# --- CONFIG RAG ---
 TABLE_NAME = "faqs"
 
 @st.cache_resource
 def load_model():
     return SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
-
 encoder = load_model()
 
 # ========================================
-# CONEXIÓN A ORACLE (Thick Mode + NNE)
+# CONEXIÓN A ORACLE
 # ========================================
 @st.cache_resource
 def get_connection():
@@ -42,9 +46,9 @@ def get_connection():
         conn = oracledb.connect(
             user=DB_USER,
             password=DB_PASSWORD,
-            dsn=DSN
+            dsn=CONNECT_ALIAS
         )
-        st.success("Conectado a Oracle ADB (NNE activado)")
+        st.success("Conectado a Oracle ADB")
         return conn
     except Exception as e:
         st.error(f"Error de conexión: {e}")
@@ -54,17 +58,15 @@ def rag_search(query: str):
     conn = get_connection()
     if not conn:
         return None
-
     vec = encoder.encode([query])[0].tolist()
     try:
         with conn.cursor() as cursor:
             cursor.setinputsizes(vector=oracledb.DB_TYPE_VECTOR)
             cursor.execute(f"""
-                SELECT
-                    JSON_VALUE(payload, '$.question') AS q,
-                    JSON_VALUE(payload, '$.answer') AS a,
-                    JSON_VALUE(payload, '$.source') AS src,
-                    VECTOR_DISTANCE(vector, TO_VECTOR(:vector), COSINE) AS dist
+                SELECT JSON_VALUE(payload, '$.question') AS q,
+                       JSON_VALUE(payload, '$.answer') AS a,
+                       JSON_VALUE(payload, '$.source') AS src,
+                       VECTOR_DISTANCE(vector, TO_VECTOR(:vector), COSINE) AS dist
                 FROM {TABLE_NAME}
                 ORDER BY dist
                 FETCH FIRST 1 ROW ONLY
@@ -75,33 +77,33 @@ def rag_search(query: str):
                 return {"pregunta": q, "respuesta": a, "fuente": src, "distancia": round(dist, 4)}
             return None
     except Exception as e:
-        st.error(f"Error Oracle: {e}")
+        st.error(f"Error SQL: {e}")
         return None
     finally:
         if 'conn' in locals():
             conn.close()
 
 # ========================================
-# GENERAR RESPUESTA
+# LLM (cambiar por Groq después)
 # ========================================
 def generate_explanation(query: str, context: str, source: str, distance: float):
     prompt = f"""
-    Eres un asistente técnico especializado en abandono de pozos petroleros.
-    Explica de forma clara, profesional y educativa.
+    Eres un experto en abandono de pozos. Responde claro y educativo.
 
     1. Respuesta directa
-    2. Contexto breve
-    3. Importancia operativa
-    4. Fuente
+    2. Contexto
+    3. Importancia
+    4. Fuente: {source}
 
-    Texto: {context}
     Pregunta: {query}
+    Texto: {context}
     """
     try:
-        response = ollama.chat(model=MODEL_NAME, messages=[{"role": "user", "content": prompt}])
+        import ollama
+        response = ollama.chat(model="gpt-oss:20b", messages=[{"role": "user", "content": prompt}])
         return response['message']['content'].strip()
     except Exception as e:
-        return f"Error LLM: {e}"
+        return f"LLM no disponible (Ollama solo local): {e}"
 
 # ========================================
 # CHAT
@@ -109,13 +111,11 @@ def generate_explanation(query: str, context: str, source: str, distance: float)
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-st.sidebar.success(f"**LLM:** `{MODEL_NAME}`")
-
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-        if message.get("fuente"):
-            st.caption(f"**Fuente:** {message['fuente']} | Dist: {message['distancia']}")
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
+        if msg.get("fuente"):
+            st.caption(f"Fuente: {msg['fuente']} | Dist: {msg['distancia']}")
 
 if prompt := st.chat_input("Ej: ¿Qué es el DTM?"):
     with st.chat_message("user"):
@@ -132,13 +132,13 @@ if prompt := st.chat_input("Ej: ¿Qué es el DTM?"):
 
             st.markdown(respuesta)
             if result and result["distancia"] <= 0.7:
-                st.caption(f"**Fuente:** {result['fuente']} | Dist: {result['distancia']}")
+                st.caption(f"Fuente: {result['fuente']} | Dist: {result['distancia']}")
 
             st.session_state.messages.append({
                 "role": "assistant",
                 "content": respuesta,
-                "fuente": result["fuente"] if result and result["distancia"] <= 0.7 else None,
-                "distancia": result["distancia"] if result and result["distancia"] <= 0.7 else None
+                "fuente": result["fuente"] if result else None,
+                "distancia": result["distancia"] if result else None
             })
 
 # ========================================
