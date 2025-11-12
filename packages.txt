@@ -1,1 +1,1 @@
-oracle-instantclient
+oracle-instantclient-basic
